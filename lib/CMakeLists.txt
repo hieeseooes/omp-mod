@@ -18,9 +18,9 @@ if(BUILD_SERVER)
 			${PAWN_RUNTIME_SRC_DIR}/amxtime.c
 			${PAWN_RUNTIME_SRC_DIR}/amxfloat.c
 		)
-		target_compile_options(pawn-runtime
-			PRIVATE "-Wno-unused-function"
-		)
+		# target_compile_options(pawn-runtime
+		# 	PRIVATE "-Wno-unused-function"
+		# )
 		target_include_directories(pawn-runtime 
 			PRIVATE ${PAWN_RUNTIME_SRC_DIR}
 			INTERFACE "${PAWN_RUNTIME_SRC_DIR}/.."
@@ -96,12 +96,12 @@ if(BUILD_LEGACY_COMPONENTS)
 # ------
 add_subdirectory(RakNet)
 set_property(TARGET raknet PROPERTY FOLDER "lib")
-target_compile_options(raknet
-	PRIVATE
-		"-Wno-logical-op-parentheses"
-		"-Wno-bitwise-op-parentheses"
-		"-Wno-#pragma-messages"
-)
+# target_compile_options(raknet
+# 	PRIVATE
+# 		"-Wno-logical-op-parentheses"
+# 		"-Wno-bitwise-op-parentheses"
+# 		"-Wno-#pragma-messages"
+# )
 endif()
 
 # ttmath

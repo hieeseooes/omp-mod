@@ -3,13 +3,13 @@ project(open-mp LANGUAGES C CXX VERSION 1.5.8)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if (NOT ${CMAKE_CXX_COMPILER_ID} MATCHES "(Clang)")
-	message(
-		FATAL_ERROR
-		"Clang is the only compiler officially supported for building."
-		"Use clang on Unix or clang-cl on Windows to build."
-	)
-endif()
+# if (NOT ${CMAKE_CXX_COMPILER_ID} MATCHES "(Clang)")
+# 	message(
+# 		FATAL_ERROR
+# 		"Clang is the only compiler officially supported for building."
+# 		"Use clang on Unix or clang-cl on Windows to build."
+# 	)
+# endif()
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -23,7 +23,7 @@ if(MSVC)
 	if(CMAKE_SIZEOF_VOID_P EQUAL 4)
 		add_compile_options("/arch:SSE2")
 	endif()
-	add_compile_options("-Werror=format")
+	# add_compile_options("-Werror=format")
 
 elseif(UNIX)
 	# Linux GCC/Clang

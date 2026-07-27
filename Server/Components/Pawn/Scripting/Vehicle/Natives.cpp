@@ -422,11 +422,12 @@ SCRIPT_API(SetVehicleSpawnInfo, bool(IVehicle& vehicle, int modelid, Vector3 pos
 
 SCRIPT_API(GetVehicleModelCount, int(int modelid))
 {
-	if (modelid < 400 || modelid > 611)
-		return 0;
-
-	auto& models = PawnManager::Get()->vehicles->models();
-	return models[modelid - 400];
+	if (modelid >= 400 && modelid <= 611)
+	{
+		auto& models = PawnManager::Get()->vehicles->models();
+		return models[modelid - 400];
+	}
+	return 0;
 }
 
 SCRIPT_API(GetVehicleModelsUsed, int())
@@ -678,4 +679,10 @@ SCRIPT_API(CountVehicleOccupants, int(IVehicle& vehicle))
 
 	occupants += passengers.size();
 	return occupants;
+}
+
+SCRIPT_API(SetCustomVehicleBaseModel, bool(int customModelId, int baseModelId))
+{
+	Impl::setCustomVehicleBaseModel(customModelId, baseModelId);
+	return true;
 }

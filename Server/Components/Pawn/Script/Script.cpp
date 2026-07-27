@@ -13,6 +13,12 @@
 
 #define _Static_assert static_assert
 
+#ifdef _MSC_VER
+#ifndef __attribute__
+#define __attribute__(x)
+#endif
+#endif
+
 #include <assert.h>
 #include <stdarg.h>
 

@@ -483,12 +483,13 @@ OMP_CAPI(Vehicle_SetSpawnInfo, bool(objectPtr vehicle, int modelid, float x, flo
 
 OMP_CAPI(Vehicle_GetModelCount, int(int modelid))
 {
-	if (modelid < 400 || modelid > 611)
-		return 0;
-
-	auto& models = ComponentManager::Get()->vehicles->models();
-	int count = models[modelid - 400];
-	return count;
+	if (modelid >= 400 && modelid <= 611)
+	{
+		auto& models = ComponentManager::Get()->vehicles->models();
+		int count = models[modelid - 400];
+		return count;
+	}
+	return 0;
 }
 
 OMP_CAPI(Vehicle_GetModelsUsed, int())

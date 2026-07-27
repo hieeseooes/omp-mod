@@ -210,7 +210,7 @@ void Query::buildRulesBuffer()
 	}
 }
 
-constexpr Span<char> getBuffer(Span<const char> input, std::unique_ptr<char[]>& buffer, size_t length)
+Span<char> getBuffer(Span<const char> input, std::unique_ptr<char[]>& buffer, size_t length)
 {
 	if (!buffer)
 	{
