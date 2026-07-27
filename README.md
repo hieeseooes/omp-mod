@@ -1,75 +1,70 @@
-# open.mp
+# omp-mod (Custom Native Vehicle Extended open.mp Server)
 
-![status](https://github.com/openmultiplayer/open.mp/workflows/Build/badge.svg)
+Custom modified fork of the **open.mp** C++ server binary, featuring native support for custom vehicles (IDs 31000–31999), MSVC 2022 (v143) toolset compilation, and array bounds protection.
 
-## Structure
+---
+
+## 🌟 Key Features & Modifications
+
+### 1. 🏎️ Native Custom Vehicle Support (IDs `31000..31999`)
+- **Direct RPC 164 (`WorldVehicleAdd`) Support**: Server natively broadcasts `CreateVehicle(31190)` with model IDs in the `31000..31999` range.
+- **No Client-Side Hot-Swapping Needed**: Vehicles stream directly with their custom DFF/TXD model indices on Android & PC clients without triggering client-side vehicle destruction/recreation (`cef:customvehicle:apply`).
+- **Automatic Physics & Base Model Mapping**: Automatically maps custom vehicle IDs to base vehicle handling IDs, passenger seat counts, and audio settings (fallback to base model `411` or user-defined `base_vehicle_id`).
+
+### 2. 🛡️ SDK & Component Array Bounds Protection
+- **Extended Model Range Validation**: Updated `isValidVehicleModel`, `getVehiclePassengerSeats`, `getVehicleModelInfo`, and `getRandomVehicleColour` across `SDK/include/Server/Components/Vehicles/` to safely validate custom model range `30000..44999`.
+- **Prevents Out-Of-Bounds Errors**: Prevents `Array index out of bounds` errors when querying model properties for IDs > 611.
+
+### 3. 🛠️ MSVC 2022 (v143) Toolset Compatibility
+- Removed strict Clang-only compiler flags.
+- Fixed MSVC compiler compatibility issues (`__attribute__` macro support and non-constexpr `getBuffer` in `LegacyNetwork`).
+
+---
+
+## 🛠️ Requirements & Tools
+
+* **CMake 3.22+**
+* **Python 3.12+** with **Conan 2.x** (`pip install conan`)
+* **Visual Studio 2022** (Desktop development with C++ / MSVC `v143` 32-bit `Win32`)
+
+---
+
+## 🚀 Building on Windows (Visual Studio 2022 MSVC)
+
+1. **Clone the Repository**:
+   ```bash
+   git clone --recursive https://github.com/hieeseooes/omp-mod.git
+   cd omp-mod
+   ```
+
+2. **Install Conan Package Manager**:
+   ```powershell
+   pip install conan
+   ```
+
+3. **Configure & Build Server Binary**:
+   ```powershell
+   mkdir build
+   cd build
+   cmake .. -A Win32 -T v143
+   cmake --build . --config RelWithDebInfo
+   ```
+
+---
+
+## 📦 Output Binaries
+
+After compilation completes successfully, generated files will be available at:
+- **Server Binary**: `build/Output/RelWithDebInfo/Server/omp-server.exe`
+- **Server Components/Plugins**: `build/Output/RelWithDebInfo/Server/components/*.dll`
+
+---
+
+## 📁 Repository Structure
 
 | Path | Content |
 | ---- | ------- |
-| `SDK/include` | Core SDK headers (stable between versions) |
-| `SDK/include/Server/Components/*/` | Components/plug-in SDK headers (stable between versions) |
-| `Shared/NetCode/` | Netcode headers (RPC and packet read/write structures, NOT stable between versions) |
-| `Shared/Network/` | Network utility headers (NOT stable between versions) |
-| `lib/` | Various submodules and third-party libraries |
-| `Server/Source/` | Core server implementation (NOT stable between versions, do NOT use headers outside the Source folder) |
-| `Server/Components/*/` | Components/plug-in implementation (NOT stable between versions, do NOT use headers outside the component's folder) |
-
-## Concepts
-
-| Name | Description |
-| ---- | ------- |
-| Entity | Something that can appear in the 3D world of the game |
-| Pool | Container of something with limited amount of IDs |
-| Component | Something that's conceptually different enough it can be separated into its own module |
-| Extensible | Something to which extensions can be added to preserve ABI compatibility |
-| Extension | Something which adds additional functionality to an extensible and preserves ABI compatibility |
-
-## Tools
-
-* [CMake 3.19+](https://cmake.org/)
-* [Conan 2.x](https://conan.io/) (Install it using `pip install conan` or `pip3 install conan`)
-
-## Tools on Windows
-
-* [Visual Studio 2019+](https://www.visualstudio.com/)
-
-Visual Studio needs the `Desktop development with C++` workload with the `C++ Clang tools for Windows` component.
-
-## Sources
-
-```bash
-# With HTTPS:
-git clone --recursive https://github.com/openmultiplayer/open.mp
-# With SSH:
-git clone --recursive git@github.com:openmultiplayer/open.mp
-```
-
-Note the use of the `--recursive` argument, because this repository contains submodules.
-
-## Building on Windows
-
-```bash
-cd open.mp
-mkdir build
-cd build
-cmake .. -A Win32 -T ClangCL
-cmake --build . --config RelWithDebInfo
-```
-
-## Building on Mac
-
-If you install conan via brew the cmake-conan script will not detect it from the default install location.  You must therefore also alias it elsewhere:
-
-```bash
-brew install conan
-sudo ln -s /usr/local/opt/conan/bin/conan /usr/local/bin/conan
-cd open.mp
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make
-```
-
-
-
-
+| `SDK/include/Server/Components/Vehicles/` | Patched Vehicle SDK headers supporting custom vehicle IDs |
+| `Server/Source/` | Core open.mp server implementation |
+| `Server/Components/Vehicles/` | Vehicle component implementation with custom vehicle bounds checks |
+| `Server/Components/Pawn/Scripting/Vehicle/` | Pawn native bindings (`CreateVehicle`, `GetVehicleModelInfo`) |
