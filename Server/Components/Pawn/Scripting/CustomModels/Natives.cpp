@@ -8,6 +8,79 @@
 
 #include "../Types.hpp"
 #include "sdk.hpp"
+#include <packet.hpp>
+#include <customzip.hpp>
+
+SCRIPT_API(RegisterCustomVehicleZip, bool(int customModelId, int baseModelId, std::string const& zipPath, std::string const& txdName))
+{
+	Impl::setCustomVehicleBaseModel(customModelId, baseModelId);
+
+	NetCode::RPC::RegisterCustomVehicle rpc;
+	rpc.customModelId = customModelId;
+	rpc.baseModelId = baseModelId;
+	rpc.zipPath = zipPath;
+	rpc.txdName = txdName;
+
+	auto players = PawnManager::Get()->core->getPlayers();
+	if (players)
+	{
+		for (IPlayer* player : players->entries())
+		{
+			PacketHelper::send(rpc, *player);
+		}
+	}
+	return true;
+}
+
+SCRIPT_API(RegisterCustomPedZip, bool(int customModelId, int baseModelId, std::string const& zipPath, std::string const& txdName))
+{
+	auto models = PawnManager::Get()->models;
+	if (models) {
+		// Just to be safe, add it as a skin model as well so server knows it's a valid model
+		models->addCustomModel(ModelType::Skin, customModelId, baseModelId, "", "");
+	}
+
+	NetCode::RPC::RegisterCustomPed rpc;
+	rpc.customModelId = customModelId;
+	rpc.baseModelId = baseModelId;
+	rpc.zipPath = zipPath;
+	rpc.txdName = txdName;
+
+	auto players = PawnManager::Get()->core->getPlayers();
+	if (players)
+	{
+		for (IPlayer* player : players->entries())
+		{
+			PacketHelper::send(rpc, *player);
+		}
+	}
+	return true;
+}
+
+SCRIPT_API(RegisterCustomObjectZip, bool(int customModelId, int baseModelId, std::string const& zipPath, std::string const& txdName))
+{
+	auto models = PawnManager::Get()->models;
+	if (models) {
+		// Add as object model so server knows it's a valid model
+		models->addCustomModel(ModelType::Object, customModelId, baseModelId, "", "");
+	}
+
+	NetCode::RPC::RegisterCustomObject rpc;
+	rpc.customModelId = customModelId;
+	rpc.baseModelId = baseModelId;
+	rpc.zipPath = zipPath;
+	rpc.txdName = txdName;
+
+	auto players = PawnManager::Get()->core->getPlayers();
+	if (players)
+	{
+		for (IPlayer* player : players->entries())
+		{
+			PacketHelper::send(rpc, *player);
+		}
+	}
+	return true;
+}
 
 SCRIPT_API(AddCharModel, bool(int baseid, int newid, std::string const& dff, std::string const& textureLibrary))
 {

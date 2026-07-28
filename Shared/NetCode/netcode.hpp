@@ -14,3 +14,4 @@
 #include "textlabel.hpp"
 #include "vehicle.hpp"
 #include "custommodels.hpp"
+#include "customzip.hpp"
