@@ -20,6 +20,11 @@
 build/
 /docker/build/
 cmake-build-*/
+Server/Components/*.dll
+Server/omp-server.exe
+Server/bans.json
+Server/log.txt
+
 
 [Rr]eleases/
 x64/

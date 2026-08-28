@@ -21,13 +21,10 @@ SCRIPT_API(RegisterCustomVehicleZip, bool(int customModelId, int baseModelId, st
 	rpc.zipPath = zipPath;
 	rpc.txdName = txdName;
 
-	auto players = PawnManager::Get()->core->getPlayers();
-	if (players)
+	auto& players = PawnManager::Get()->core->getPlayers();
+	for (IPlayer* player : players.entries())
 	{
-		for (IPlayer* player : players->entries())
-		{
-			PacketHelper::send(rpc, *player);
-		}
+		PacketHelper::send(rpc, *player);
 	}
 	return true;
 }
@@ -46,13 +43,10 @@ SCRIPT_API(RegisterCustomPedZip, bool(int customModelId, int baseModelId, std::s
 	rpc.zipPath = zipPath;
 	rpc.txdName = txdName;
 
-	auto players = PawnManager::Get()->core->getPlayers();
-	if (players)
+	auto& players = PawnManager::Get()->core->getPlayers();
+	for (IPlayer* player : players.entries())
 	{
-		for (IPlayer* player : players->entries())
-		{
-			PacketHelper::send(rpc, *player);
-		}
+		PacketHelper::send(rpc, *player);
 	}
 	return true;
 }
@@ -71,13 +65,10 @@ SCRIPT_API(RegisterCustomObjectZip, bool(int customModelId, int baseModelId, std
 	rpc.zipPath = zipPath;
 	rpc.txdName = txdName;
 
-	auto players = PawnManager::Get()->core->getPlayers();
-	if (players)
+	auto& players = PawnManager::Get()->core->getPlayers();
+	for (IPlayer* player : players.entries())
 	{
-		for (IPlayer* player : players->entries())
-		{
-			PacketHelper::send(rpc, *player);
-		}
+		PacketHelper::send(rpc, *player);
 	}
 	return true;
 }
