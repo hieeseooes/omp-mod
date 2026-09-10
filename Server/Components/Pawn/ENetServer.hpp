@@ -7,11 +7,15 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <sstream>
 
 #include "vendor/enet/enet/enet.h"
 
 class ENetServer {
 public:
+    static inline std::unordered_map<uint16_t, std::string> g_vehicleLightStates;
+
     static bool Init(uint16_t port = 7782) {
         static bool initialized = false;
         if (initialized) return true;
@@ -25,7 +29,7 @@ public:
         address.host = ENET_HOST_ANY;
         address.port = port;
 
-        g_serverHost = enet_host_create(&address, 1000, 2, 0, 0);
+        g_serverHost = enet_host_create(&address, 128, 2, 0, 0);
         if (!g_serverHost) {
             std::cout << "[ENetServer] Failed to create ENet Server Host on port " << port << "!" << std::endl;
             enet_deinitialize();
@@ -45,10 +49,46 @@ public:
             switch (event.type) {
             case ENET_EVENT_TYPE_CONNECT:
                 std::cout << "[ENetServer] Client connected to ENet Port 7782!" << std::endl;
+                enet_peer_timeout(event.peer, 32, 10000, 30000);
+                enet_peer_ping_interval(event.peer, 1000);
+
+                // Sync all current active vehicle light states to newly connected client
+                for (const auto& pair : g_vehicleLightStates) {
+                    std::string payload = std::to_string(pair.first) + " " + pair.second;
+                    size_t len = 1 + payload.length();
+                    uint8_t* buf = new uint8_t[len];
+                    buf[0] = 226;
+                    memcpy(&buf[1], payload.c_str(), payload.length());
+                    ENetPacket* initPacket = enet_packet_create(buf, len, ENET_PACKET_FLAG_RELIABLE);
+                    delete[] buf;
+                    enet_peer_send(event.peer, 0, initPacket);
+                }
+                enet_host_flush(g_serverHost);
                 break;
             case ENET_EVENT_TYPE_RECEIVE: {
                 if (event.packet && event.packet->dataLength >= 1) {
                     uint8_t rpcId = event.packet->data[0];
+                    if (rpcId == 200) {
+                        // Keep-alive heartbeat ping, consume without relaying
+                        enet_packet_destroy(event.packet);
+                        break;
+                    }
+
+                    if (rpcId == 226 && event.packet->dataLength > 1) {
+                        std::string msg((char*)&event.packet->data[1], event.packet->dataLength - 1);
+                        std::stringstream ss(msg);
+                        uint16_t vehId = 0;
+                        int indState = 0;
+                        int fogState = 0;
+                        if (ss >> vehId >> indState >> fogState) {
+                            if (indState == 3 && fogState == 0) {
+                                g_vehicleLightStates.erase(vehId);
+                            } else {
+                                g_vehicleLightStates[vehId] = std::to_string(indState) + " " + std::to_string(fogState);
+                            }
+                        }
+                    }
+
                     std::cout << "[ENetServer] Received Client RPC " << (int)rpcId << " (" << event.packet->dataLength << " bytes), relaying to peers..." << std::endl;
                     for (size_t i = 0; i < g_serverHost->peerCount; ++i) {
                         ENetPeer* peer = &g_serverHost->peers[i];
