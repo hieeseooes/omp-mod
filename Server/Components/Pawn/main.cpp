@@ -10,7 +10,6 @@
 #include "PluginManager/PluginManager.hpp"
 #include "Scripting/Impl.hpp"
 #include "Server/Components/Pawn/pawn.hpp"
-#include "ENetServer.hpp"
 #include <ghc/filesystem.hpp>
 #include <stdlib.h>
 
@@ -116,8 +115,6 @@ public:
 		PawnManager::Get()->players = &core->getPlayers();
 		PawnManager::Get()->pluginManager.core = core;
 		core->getEventDispatcher().addEventHandler(this);
-
-		ENetServer::Init(7782);
 
 		// Set AMXFILE environment variable to "{current_dir}/scriptfiles"
 		ghc::filesystem::path scriptfilesPath = ghc::filesystem::absolute("scriptfiles");
@@ -258,7 +255,6 @@ public:
 
 	void onTick(Microseconds elapsed, TimePoint now) override
 	{
-		ENetServer::Update();
 		PawnManager::Get()->pluginManager.ProcessTick();
 		PawnManager::Get()->ProcessTick(elapsed, now);
 	}

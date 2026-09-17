@@ -10,7 +10,6 @@
 #include "../../format.hpp"
 #include "sdk.hpp"
 #include <iostream>
-#include "../../ENetServer.hpp"
 
 SCRIPT_API(SendClientMessage, bool(IPlayer& player, uint32_t colour, cell const* format))
 {
@@ -51,9 +50,6 @@ SCRIPT_API(SendCustomRPC, bool(IPlayer& player, int rpcId, cell const* format))
 		memcpy(&data[1], sv.data(), len);
 	}
 	player.sendRPC(rpcId, Span<uint8_t>(data, len + 1), 0);
-
-	// Send over ENet Secondary UDP Channel (Port 7782)
-	ENetServer::BroadcastRPC(static_cast<uint8_t>(rpcId), std::string(sv.data(), sv.length()));
 	return true;
 }
 
